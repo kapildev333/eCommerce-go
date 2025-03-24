@@ -1,14 +1,16 @@
 package controllers
 
 import (
+	"database/sql"
 	"eCommerce-go/db"
 	"eCommerce-go/models"
 	"eCommerce-go/utils"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func getAllShippingAddresses(c *gin.Context) {
+func getAllShippingAddressesHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, utils.Response{
@@ -53,7 +55,7 @@ func getAllShippingAddresses(c *gin.Context) {
 	})
 }
 
-func addAddress(c *gin.Context) {
+func addAddressHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, utils.Response{
@@ -90,8 +92,49 @@ func addAddress(c *gin.Context) {
 	})
 
 }
+func getAddressHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.Response{
+			StatusCode: http.StatusUnauthorized,
+			Error:      true,
+			Message:    "Unauthorized",
+		})
+		return
+	}
+	addressId := c.DefaultQuery("addressID", "")
+	query := "SELECT * FROM shipping_addresses WHERE user_id = $1 AND id = $2"
+	row := db.DB.QueryRow(query, userID, addressId)
+
+	var address models.ShippingAddress
+	if err := row.Scan(&address.ID, &address.UserID, &address.AddressLine1, &address.AddressLine2, &address.City, &address.State, &address.PostalCode, &address.Country, &address.IsDefault, &address.UpdatedAt, &address.CreatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			c.JSON(http.StatusNotFound, utils.Response{
+				StatusCode: http.StatusNotFound,
+				Error:      true,
+				Message:    "Address not found",
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, utils.Response{
+				StatusCode: http.StatusInternalServerError,
+				Error:      true,
+				Message:    "Error scanning address",
+			})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.Response{
+		StatusCode: http.StatusOK,
+		Error:      false,
+		Message:    "Address retrieved",
+		Data:       gin.H{"address": address},
+	})
+
+}
 func ConfigAddressController(group *gin.RouterGroup) {
 	accounts := group.Group("address")
-	accounts.GET("/getAllAddress", getAllShippingAddresses)
-	accounts.POST("/addAddress", addAddress)
+	accounts.GET("/getAllAddress", getAllShippingAddressesHandler)
+	accounts.POST("/addAddress", addAddressHandler)
+	accounts.GET("/getAddress", getAddressHandler)
 }
