@@ -1,0 +1,9 @@
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: kapil
+      POSTGRES_PASSWORD: Kapil333
+      POSTGRES_DB: eCommerce
+    ports:
+      - "5432:5432"
