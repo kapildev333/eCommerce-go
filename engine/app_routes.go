@@ -15,5 +15,6 @@ func ConfigRoutes(router *gin.Engine) {
 	protected := router.Group("/v1")
 	protected.Use(utils.AuthMiddleware())
 	controllers.ConfigAddressController(protected)
+	controllers.ConfigPaymentController(protected)
 	// Add other protected routes here
 }

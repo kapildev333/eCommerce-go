@@ -22,3 +22,19 @@ CREATE TABLE "shipping_addresses"
     updated_at     TIMESTAMPTZ  NOT NULL DEFAULT now(),
     created_at     TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
+
+CREATE TABLE "user_payments"
+(
+    id                 SERIAL PRIMARY KEY,
+    user_id            INTEGER REFERENCES users (id) ON DELETE CASCADE,
+    payment_method     VARCHAR(50)    NOT NULL,                                              -- e.g., credit_card, paypal, bank_transfer
+    transaction_id     VARCHAR(255) UNIQUE,                                                  -- Unique ID from payment gateway
+    amount             DECIMAL(10, 2) NOT NULL,
+    currency           VARCHAR(3)     NOT NULL DEFAULT 'USD',                                -- ISO 4217 currency code
+    payment_status     VARCHAR(50)    NOT NULL,                                              -- e.g., pending, completed, failed, refunded
+    payment_date       TIMESTAMPTZ    NOT NULL DEFAULT now(),
+    billing_address_id INTEGER        REFERENCES shipping_addresses (id) ON DELETE SET NULL, -- Optional billing address
+    description        TEXT,                                                                 -- Optional description of the payment
+    updated_at         TIMESTAMPTZ    NOT NULL DEFAULT now(),
+    created_at         TIMESTAMPTZ    NOT NULL DEFAULT now()
+);
