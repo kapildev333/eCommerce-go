@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"eCommerce-go/db"
+	"eCommerce-go/middleware"
 	"eCommerce-go/models"
 	"eCommerce-go/utils"
 	"github.com/gin-gonic/gin"
@@ -9,15 +10,7 @@ import (
 )
 
 func submitPaymentHandler(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, utils.Response{
-			StatusCode: http.StatusUnauthorized,
-			Error:      true,
-			Message:    "Unauthorized",
-		})
-		return
-	}
+	userID := middleware.CheckUserExist(c)
 	var payment models.UserPayment
 	if err := c.ShouldBindJSON(&payment); err != nil {
 		c.JSON(http.StatusBadRequest, utils.Response{
@@ -46,15 +39,7 @@ func submitPaymentHandler(c *gin.Context) {
 	})
 }
 func getPaymentHistoryHandler(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, utils.Response{
-			StatusCode: http.StatusUnauthorized,
-			Error:      true,
-			Message:    "Unauthorized",
-		})
-		return
-	}
+	userID := middleware.CheckUserExist(c)
 	var paymentHistory []models.UserPayment
 	query := "SELECT *FROM user_payments WHERE user_id = $1"
 	rows, err := db.DB.Query(query, userID)

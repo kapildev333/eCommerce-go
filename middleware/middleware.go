@@ -3,6 +3,7 @@ package middleware
 import (
 	config "eCommerce-go/utils"
 	logger "eCommerce-go/utils"
+	utils "eCommerce-go/utils"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -48,7 +49,9 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		accessToken := fields[1]
-		token, err := TokenServiceInstance.ValidateToken(accessToken, config.Env.AccessTokenSecret)
+		token, err := jwt.ParseWithClaims(accessToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+			return []byte(config.Env.AccessTokenSecret), nil
+		})
 		if err != nil {
 			log.Warn("Auth middleware failed: Invalid token", "path", c.Request.URL.Path, "error", err)
 			// Check for specific JWT errors like expiry
@@ -61,7 +64,9 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		// Extract claims (we stored Claims struct during creation)
+		fmt.Println(token.Claims)
 		claims, ok := token.Claims.(*Claims)
+		fmt.Println(claims)
 		if !ok || !token.Valid {
 			log.Error("Auth middleware failed: Invalid token claims", "path", c.Request.URL.Path)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token claims"})
@@ -75,4 +80,16 @@ func AuthMiddleware() gin.HandlerFunc {
 		log.Debug("Auth middleware success", "path", c.Request.URL.Path, "userID", claims.UserID)
 		c.Next() // Proceed to the next handler
 	}
+}
+
+func CheckUserExist(c *gin.Context) string {
+	userID, exists := c.Get(UserIDKey)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.Response{
+			StatusCode: http.StatusUnauthorized,
+			Error:      true,
+			Message:    "Unauthorized",
+		})
+	}
+	return userID.(string)
 }
