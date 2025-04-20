@@ -3,6 +3,7 @@ package controllers
 import (
 	"database/sql"
 	"eCommerce-go/db"
+	"eCommerce-go/middleware"
 	"eCommerce-go/models"
 	"eCommerce-go/utils"
 	"errors"
@@ -11,16 +12,7 @@ import (
 )
 
 func getAllShippingAddressesHandler(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, utils.Response{
-			StatusCode: http.StatusUnauthorized,
-			Error:      true,
-			Message:    "Unauthorized",
-		})
-		return
-	}
-
+	userID := middleware.CheckUserExist(c)
 	var addresses []models.ShippingAddress
 	query := "SELECT id, user_id, address_line_1, address_line_2, city, state, postal_code, country, is_default, updated_at, created_at FROM shipping_addresses WHERE user_id = $1"
 	rows, err := db.DB.Query(query, userID)
@@ -56,15 +48,7 @@ func getAllShippingAddressesHandler(c *gin.Context) {
 }
 
 func addAddressHandler(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, utils.Response{
-			StatusCode: http.StatusUnauthorized,
-			Error:      true,
-			Message:    "Unauthorized",
-		})
-		return
-	}
+	userID := middleware.CheckUserExist(c)
 	var address models.ShippingAddress
 	if err := c.ShouldBindJSON(&address); err != nil {
 		c.JSON(http.StatusBadRequest, utils.Response{
@@ -93,15 +77,7 @@ func addAddressHandler(c *gin.Context) {
 
 }
 func getAddressHandler(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, utils.Response{
-			StatusCode: http.StatusUnauthorized,
-			Error:      true,
-			Message:    "Unauthorized",
-		})
-		return
-	}
+	userID := middleware.CheckUserExist(c)
 	addressId := c.DefaultQuery("addressID", "")
 	query := "SELECT * FROM shipping_addresses WHERE user_id = $1 AND id = $2"
 	row := db.DB.QueryRow(query, userID, addressId)

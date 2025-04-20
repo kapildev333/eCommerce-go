@@ -1,6 +1,7 @@
 # eCommerce-go
 
-This is an eCommerce application built with Go, Gin framework, and PostgreSQL. The application provides functionalities for managing users, shipping addresses, and user payments.
+This is an eCommerce application built with Go, Gin framework, and PostgreSQL. The application provides functionalities
+for managing users, shipping addresses, and user payments.
 
 ## Table of Contents
 

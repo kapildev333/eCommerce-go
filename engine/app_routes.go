@@ -2,7 +2,7 @@ package engine
 
 import (
 	"eCommerce-go/controllers"
-	"eCommerce-go/utils"
+	middleware "eCommerce-go/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,8 +13,7 @@ func ConfigRoutes(router *gin.Engine) {
 
 	// Protected routes
 	protected := router.Group("/v1")
-	protected.Use(utils.AuthMiddleware())
+	protected.Use(middleware.AuthMiddleware())
 	controllers.ConfigAddressController(protected)
 	controllers.ConfigPaymentController(protected)
-	// Add other protected routes here
 }
