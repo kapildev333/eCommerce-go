@@ -16,4 +16,6 @@ func ConfigRoutes(router *gin.Engine) {
 	protected.Use(middleware.AuthMiddleware())
 	controllers.ConfigAddressController(protected)
 	controllers.ConfigPaymentController(protected)
+	controllers.ConfigCategoryController(protected)
+	controllers.ConfigProductController(protected)
 }

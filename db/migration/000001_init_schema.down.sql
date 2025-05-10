@@ -1,3 +1,17 @@
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS shipping_addresses;
 DROP TABLE IF EXISTS user_payments;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS product_images;
+DROP TABLE IF EXISTS product_categories;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS inventory_movements;
+DROP TABLE IF EXISTS inventory;
+DROP TABLE IF EXISTS product_variants;
+DROP TABLE IF EXISTS product_variant_options;
+DROP TABLE IF EXISTS product_options;
+DROP TABLE IF EXISTS product_option_values;
+DROP TABLE IF EXISTS product_attributes;
+DROP TABLE IF EXISTS product_attribute_values;
